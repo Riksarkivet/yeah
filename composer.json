@@ -1,0 +1,37 @@
+{
+    "name": "riksarkivet/yeah-demo",
+    "description": "Riksarkivet's demonstration of capabilities of Linked Open Data, made under the YEAH! (You Enhance Access to History!) project.",
+    "authors": [
+        {
+            "name": "Björn Ali Göransson",
+            "email": "bornemix@gmail.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/moment/moment.git"
+        },
+        {
+          "type": "package",
+          "package": {
+              "name": "codemirror/codemirror",
+              "version": "3.19",
+              "dist": {
+              "url": "http://codemirror.net/codemirror-3.19.zip",
+              "type": "zip"
+              }
+          }
+        }
+    ],
+	  "require": {
+		  "components/jquery": "1.*",
+      "components/underscore": "*",
+		  "twitter/bootstrap": "v3.0.0",
+		  "fortawesome/font-awesome": "3.*",
+		  "leafo/lessphp": "0.4.0",
+		  "moment/moment": "dev-master",
+		  "codemirror/codemirror": "3.*",
+		  "jsor/proj4php": "dev-master"
+    }
+}

@@ -1,0 +1,183 @@
+
+
+
+/* GLOBAL ELEMENTS */
+
+body {
+  margin-top: 0;
+  overflow-y: scroll;
+}
+
+
+
+/* NAVBAR */
+
+.navbar {
+  border-radius: 0;
+  
+  .navbar-brand {
+    abbr {
+      border-bottom: dotted 1px white;
+    }
+  }
+}
+
+
+
+/* MAP */
+
+#map {
+  position: relative;
+}
+
+#map-canvas {
+  height: 500px;
+}
+
+.tooltip {
+  #map & {
+    margin-top: -15px !important;
+  }
+
+  &.in {
+    .opacity(1);
+  }
+}
+
+.shortcut-container {
+  position: absolute;
+  margin-top: 20px;
+  padding-top: 12px;
+  text-align: center;
+  white-space: nowrap;
+  z-index: 1031;
+  
+  .btn {
+    position: relative;
+    
+    i {
+      transition: opacity .3s ease-in-out;
+    }
+    &.has-count:hover i {
+      .opacity(0.2);
+    }
+    
+    .count {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      text-shadow: 0 1px 0 white;
+      .opacity(0.2);
+      transition: opacity .3s ease-in-out;
+      margin-top: 6px;
+    }
+    &.has-count:hover .count {
+      .opacity(1);
+    }
+  }
+}
+
+
+
+/* OTHER */
+
+.alert {
+  padding: 5px;
+  font-size: 12px;
+}
+
+#permits-list {
+  min-height: 610px;
+
+  .media {
+    min-height: 110px;
+    .img-thumbnail {
+      max-width: 60px;
+      background: white;
+    }
+    
+    .btn {
+      display: inline-block;
+      margin-bottom: 5px;
+    }
+  }
+}
+
+.nav-tabs > li {
+  .text {
+    margin-left: 10px;
+  }
+  
+  .active-label {
+    display: none;
+  }
+
+  &.active {
+    .icon-remove {
+      margin-left: 10px;
+      color: #999;
+      &:hover {
+        color: @text-color;
+      }
+    }
+
+    .active-label {
+      display: block;
+    }
+
+    .inactive-label {
+      display: none;
+    }
+  }
+}
+
+.tab-pane {
+  padding: 15px 5px 5px;
+  margin-bottom: 15px;
+  
+  &#map {
+    padding: 0;
+  }
+  
+  form {
+    margin-bottom: 15px;
+  }
+}
+
+.tab-content {
+  background: white;
+}
+
+#permits-pager {
+  text-align: center;
+}
+
+.pagination {
+  margin: 0;
+}
+
+#block-container {
+  .blocks {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    display: inline;
+    
+    li {
+      display: inline-block;
+      margin: 0;
+      
+      .btn {
+        display: inline-block;
+        margin-bottom: 5px;
+        margin-right: 5px;
+      }
+    }
+  }
+}
+
+.input-group-btn select{
+  margin-right: 5px;
+}
