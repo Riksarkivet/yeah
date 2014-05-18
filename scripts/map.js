@@ -214,6 +214,7 @@ var map = {
               .attr('data-placement', 'bottom')
               .attr('title', 'Open block tab')
               .click(function () {
+                $(this).tooltip('hide');
                 block.showInfo(polygon.blockUri, { label: polygon.blockName });
               })
               .tooltip({ container: 'body' })
@@ -279,7 +280,7 @@ $(function () {
 
   google.maps.event.addListener(map.instance, 'dragend', function () {
     if (map.instance.getZoom() < 16) {
-      return;
+      //return;
     }
 
     if (map.polygonOwnership == 'block.showInfo' && $('#block-container ul.nav-tabs li.active').length > 0) {
@@ -293,7 +294,7 @@ $(function () {
 
   google.maps.event.addListener(map.instance, 'zoom_changed', function () {
     if (map.instance.getZoom() < 16) {
-      return;
+      //return;
     }
 
     if (map.polygonOwnership == 'block.showInfo' && $('#block-container ul.nav-tabs li.active').length > 0) {

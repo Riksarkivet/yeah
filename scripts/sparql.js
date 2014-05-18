@@ -104,9 +104,13 @@ var sparql = {
             entity[propertyName] = triple.o;
           }
         }
+        
+        _.each(type.columns, function (column) {
+          if (column.multiple && !entity[column.name]) {
+            entity[column.name] = [];
+          }
+        });
       });
-
-      // TODO: Go through 'multiple' propertyTypes and populate entities with empty arrays (if not set)?
 
       callback(entities);
     });

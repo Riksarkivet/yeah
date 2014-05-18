@@ -4,19 +4,24 @@ var block = {
   id: 'blocks',
   prefixes: {
     dc: 'http://purl.org/dc/elements/1.1/',
+    dcterms: 'http://purl.org/dc/terms/',
     foaf: 'http://xmlns.com/foaf/0.1/',
     place: 'http://purl.org/ontology/places#',
     bpc: 'http://www.ldb-centrum.se/yeah/SwedishConcepts/20140123/',
     rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-    rdfs: 'http://www.w3.org/2000/01/rdf-schema#'
+    rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
+    skos: 'http://www.w3.org/2004/02/skos/core#'
   },
   rdfType: 'bpc:Kvarter',
-  graph: 'http://www.ldb-centrum.se/yeah/Kvarter20140310/',
+  graph: 'http://www.ldb-centrum.se/yeah/Kvarter20140321/',
   columns: (function () {
     var columns = [
       { type: 'rdf:type', name: 'rdfType', multiple: true },
       { type: 'rdfs:seeAlso', multiple: true },
-      { type: 'rdfs:label' }
+      { type: 'dcterms:isPartOf' },
+      { type: 'dcterms:hasPart', multiple: true },
+      { type: 'rdfs:label' },
+      { type: 'skos:altLabel', multiple: true }
     ];
 
     $.each(columns, function (i, column) {
@@ -34,7 +39,7 @@ var block = {
   getButton: function (uri, data, title) {
     var button;
 
-    if (uri && !data) {
+    if (uri && !data && !title) {
       button = loadingPlaceholder(function (contents) {
         sparql.getEntity(block, uri, function (entity) {
           contents.empty();
@@ -42,7 +47,7 @@ var block = {
           if (entity) {
             contents.append(block.getButton(uri, entity));
           } else {
-            contents.append(rawData.getButton('block', uri));
+            contents.append(block.getButton(uri, null, block.label));
           }
         });
       });
@@ -61,6 +66,9 @@ var block = {
     var propertiesField = $('<div>').append('<i class="icon icon-refresh icon-spin"></i>');
 
     table.create({
+      'Has part': data.hasPart && data.hasPart.length ? _.map(data.hasPart, function(uri){return block.getButton(uri);}) : undefined,
+      'Is part of': data.isPartOf ? block.getButton(data.isPartOf, null, null) : undefined,
+      'Alternate names': data.altLabel ? data.altLabel.join(', ') : undefined,
       'Properties': propertiesField,
       'Streets': (function (contents) {
         street.findByBlockName(data.label, function (streets) {
@@ -96,7 +104,7 @@ var block = {
 
         return contents;
       })($('<div>').append('<i class="icon icon-spin icon-refresh"></i>')),
-      'Other': [shortcuts.generate('block', '', { block: data.label }), ' ', rawData.getButton('block', uri)]
+      'Other': [shortcuts.generate('block', uri, { block: data.label }), ' ', rawData.getButton('block', uri)]
     }).appendTo(contents);
 
     property.findByBlock(uri, function (properties) {

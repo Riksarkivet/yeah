@@ -1,6 +1,10 @@
 var rawData = {
-  getButton: function (type, uri) {
-    var button = $('<button class="btn btn-default btn-xs"><i class="icon-code"></i> Raw data</button>')
+  getButton: function (type, uri, title) {
+    if (typeof title == 'undefined') {
+      title = ' Raw data';
+    }
+
+    var button = $('<button class="btn btn-default btn-xs"><i class="icon-code"></i>' + title + '</button>')
     .click(function () {
       rawData.show(uri, window[camelCase(type)].graph, window[camelCase(type)].label, window[camelCase(type)].icon);
     });
@@ -35,10 +39,63 @@ var rawData = {
         $.map(data, function (row) {
           var content = [];
 
+          var lastSegmentOfUri = getLastSegmentOfURI(row.p);
+
+          if (lastSegmentOfUri == 'Kvarter') {
+            content.push(rawData.getButton('block', row.o, ''));
+            content.push(' ');
+          }
+
+          if (lastSegmentOfUri == 'depiction') {
+            content.push($('<a class="btn btn-default btn-xs" target="_blank"><i class="icon-link"></i></a>')
+            .attr('href', row.o));
+            content.push(' ');
+          }
+
+          if (lastSegmentOfUri == 'Teknik') {
+            content.push($('<button class="btn btn-default btn-xs"><i class="icon-code"></i></button>')
+            .click(function () {
+              rawData.show(row.o, 'http://www.ldb-centrum.se/yeah/SwedishConcepts/20140123/', 'Technology', 'file');
+            }));
+            content.push(' ');
+          }
+
+          if (lastSegmentOfUri == 'medium') {
+            content.push($('<button class="btn btn-default btn-xs"><i class="icon-code"></i></button>')
+            .click(function () {
+              rawData.show(row.o, 'http://www.ldb-centrum.se/yeah/SwedishConcepts/20140123/', 'Medium', 'file');
+            }));
+            content.push(' ');
+          }
+
+          if (lastSegmentOfUri == 'Arkitekt') {
+            content.push($('<button class="btn btn-default btn-xs"><i class="icon-code"></i></button>')
+            .click(function () {
+              rawData.show(row.o, buildingPermit.graph, 'Architect', 'user');
+            }));
+            content.push(' ');
+          }
+
+          if (lastSegmentOfUri == 'KlientNamn') {
+            content.push($('<button class="btn btn-default btn-xs"><i class="icon-code"></i></button>')
+            .click(function () {
+              rawData.show(row.o, buildingPermit.graph, 'Client name', 'user');
+            }));
+            content.push(' ');
+          }
+
+          if (row.o.indexOf('/Kvarter2014') != -1) {
+            content.push($('<button class="btn btn-default btn-xs"><i class="icon-code"></i></button>')
+            .click(function () {
+              rawData.show(row.o, block.graph, 'Block', 'map-marker');
+            }));
+            content.push(' ');
+          }
+
           content.push(row.o);
 
           return $('<tr>')
-          .append($('<th>').append(getLastSegmentOfURI(row.p) + (row.lang ? ' (' + row.lang + ')' : ''))).attr('title', row.p)
+          .append($('<th>').append(lastSegmentOfUri + (row.lang ? ' (' + row.lang + ')' : '')).attr('title', row.p))
           .append($('<td>').append(content));
         })
       );
@@ -51,7 +108,7 @@ var rawData = {
       fontSize: 12
     })
     .append('URI: ')
-    .append('<code>' + uri + '</code>')
+    .append('<a href="' + uri + '" target="_blank"><code>' + uri + '</code></a>')
     .append('<br>')
     .append('<br>')
     .append('Graph: ')

@@ -5,7 +5,7 @@ var property = {
     bpc: 'http://www.ldb-centrum.se/yeah/SwedishConcepts/20140123/',
     geo: 'http://www.w3.org/2003/01/geo/wgs84_pos#'
   },
-  graph: 'http://www.ldb-centrum.se/yeah/SthlmProperties20140314/',
+  graph: 'http://www.ldb-centrum.se/yeah/SthlmProperties20140320/',
   findInBoundary: function (a, b, c, d, callback) {
     sparql.selectAll({
       prefixes: property.prefixes,

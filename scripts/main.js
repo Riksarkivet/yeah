@@ -1,5 +1,5 @@
 $(function () {
-  $('nav .navbar-brand').tooltip();
+  $('nav a.navbar-brand, nav .navbar-nav > li > a').tooltip();
 });
 
 function getLastSegmentOfURI(uri){
@@ -163,3 +163,56 @@ function showConcept(uri, icon){
 
   $.when(promise1, promise2, promise3).then(clearLoading);
 }
+
+function showBuildingPermitPerson(uri, title){
+  var id = 'building-permit-person-' + uri.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  var contents = tab.create('#block-container', '<i class="icon-refresh icon-spin"></i>', title, id);
+
+  function clearLoading() {
+    $('ul.nav-tabs a[href="#pane-' + id + '"] i.icon-refresh.icon-spin').removeClass('icon-refresh icon-spin').addClass('icon-user');
+  }
+
+  sparql.selectOne({
+    prefixes: buildingPermit.prefixes,
+    columns: ['?type', '?creator', '?title', '?isPartOf', '?givenName'],
+    where: [
+      '<' + uri + '> rdf:type ?type',
+      '<' + uri + '> foaf:givenName ?givenName'
+    ],
+    optionalColumns: [
+      '<' + uri + '> dc:creator ?creator',
+      '<' + uri + '> dc:isPartOf ?isPartOf',
+      '<' + uri + '> foaf:title ?title'
+    ],
+    from: buildingPermit.graph
+  }, function (row) {
+    clearLoading();
+
+    if (row) {
+      table.create({
+        'Type': row.type,
+        'Creator': buildingPermit.getButton(row.creator),
+        'Is part of': buildingPermit.getButton(row.isPartOf),
+        'Title': row.title,
+        'Given name': [
+          $('<button class="btn btn-default btn-xs"><i class="icon-search"></i></button>')
+          .click(function () {
+            persons.searchFor(row.givenName, 'givenName');
+          }),
+          ' ',
+          row.givenName
+        ],
+        'Other': $('<button class="btn btn-default btn-xs"><i class="icon-code"></i> Raw data</button>')
+          .click(function () {
+            rawData.show(uri, buildingPermit.graph, title, 'user');
+          })
+      }).appendTo(contents);
+    } else {
+      contents.append('<div class="alert alert-warning">Nothing found!</div>');
+    }
+  });
+}
+
+$(document).on('click', 'a.dropdown-toggle', function () {
+  $(this).tooltip('hide');
+})

@@ -10,13 +10,14 @@ var persons = {
     rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   },
   rdfType: 'foaf:Person',
-  graph: 'http://ldb-centrum.se/yeah/Mantalslangder20140311/',
+  graph: 'http://ldb-centrum.se/yeah/Mantalslangder20140320/',
   columns: (function () {
     var columns = [
       { type: 'rdf:type', name: 'rdfType' },
       { type: 'foaf:title' },
       { type: 'foaf:givenName' },
       { type: 'foaf:firstName' },
+      { type: 'dc:description' },
       { type: 'foaf:lastName' },
       { type: 'bpc:Kvarter', name: 'block' },
       { type: 'bpc:Fastighet', name: 'property' },
@@ -49,12 +50,17 @@ var persons = {
         var contents = tab.create('#block-container', '<i class="icon-' + persons.icon + '"></i>', persons.getTitle(data), 'detail-' + uri.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
 
         table.create({
+          'First name': data.firstName,
+          'Last name': data.lastName,
+          'Title': data.title,
+          'Description': data.description,
+          'Property info': data.property,
           'Block': loadingPlaceholder(function (contents) {
             sparql.getEntity(block, data.block, function (entity) {
               contents.empty().append(block.getButton(data.block, entity));
             });
           }),
-          'Parish': parish.doQuery(data.parish),
+          'Parish': data.parish && data.parish.length ? parish.doQuery(data.parish) : undefined,
           'Source': _.map(data.source, function (source) {
             var button = $('<button class="btn btn-default btn-xs"><i class="icon-book"></i> Census data</button>')
             .click(function () {
@@ -176,17 +182,23 @@ var persons = {
       return persons.label;
     }
 
-    var name = data.givenName ? data.givenName : '';
+    var name;
 
-    if (data.firstName) {
-      name += data.firstName;
-    }
-    
-    if(data.lastName){
-      if (name != '') {
-        name += ' ' + data.lastName;
-      } else {
-        name = data.lastName;
+    if (data.givenName) {
+      name = data.givenName;
+    } else {
+      name = '';
+
+      if (data.firstName) {
+        name += data.firstName;
+      }
+
+      if (data.lastName) {
+        if (name != '') {
+          name += ' ' + data.lastName;
+        } else {
+          name = data.lastName;
+        }
       }
     }
 
@@ -196,6 +208,10 @@ var persons = {
       } else {
         name = data.title;
       }
+    }
+
+    if (!name) {
+      name = persons.label;
     }
 
     return name;
@@ -224,7 +240,7 @@ var persons = {
       persons.list();
       return;
     }
-    
+
     var select = $('#' + persons.id + ' select');
     var value = select.val();
 

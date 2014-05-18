@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <base href="http://130.240.234.101/yeah-sthlm/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YEAH! project</title>
-    
+  
   <?php
     ini_set('display_errors', 1);
 
@@ -25,7 +26,7 @@
   <?php include 'nav.php'; ?>
   <div class="" style="padding: 0 15px">
     <div class="row">
-      <div class="col-sm-8">
+      <div class="col-sm-12">
         <div id="main-column-tabs" class="raw-data-container">
           <ul class="nav nav-tabs">
           </ul>
@@ -47,6 +48,8 @@
   <script src="vendor/twitter/bootstrap/js/tooltip.js"></script>
   <script src="vendor/twitter/bootstrap/js/dropdown.js"></script>
   <script src="vendor/moment/moment/min/moment.min.js"></script>
+  <script src="scripts/building-permit.js"></script>
+  <script src="scripts/block.js"></script>
   <script src="scripts/tab.js"></script>
   <script src="scripts/sparql.js"></script>
   <script src="scripts/shortcuts.js"></script>
@@ -59,7 +62,7 @@
   <script src="scripts/main.js"></script>
 
   <script>
-    rawData.show('<?php echo $_GET['uri']; ?>', '<?php echo $_GET['graph']; ?>', '<?php echo $_GET['title']; ?>', '<?php echo $_GET['icon']; ?>');
+    rawData.show('<?php echo $_GET['uri']; ?>' + (location.href.indexOf('#') != -1 ? location.href.substr(location.href.indexOf('#')) : ''), '<?php echo $_GET['graph']; ?>', '<?php echo $_GET['title']; ?>', '<?php echo $_GET['icon']; ?>');
   </script>
 </body>
 </html>

@@ -11,6 +11,7 @@ var logger = {
     link.data('query', query);
     link.data('response', response);
     link.html('SELECT ' + query.match(/SELECT ([^\n]+)\n/)[1] + '<br>&nbsp;&nbsp;FROM ' + query.match(/FROM <([^>]+)>/)[1] + ' (' + response.length + ' results)');
+    link.attr('data-toggle', 'tooltip');
 
     $('<li>').append(link).appendTo(logger.instance);
 
@@ -20,9 +21,9 @@ var logger = {
     logger.instance.find('a').each(function () {
       var link = $(this);
 
-      var moment = link.data('moment')
+      var moment = link.data('moment');
 
-      link.attr('title', moment.fromNow());
+      link.tooltip({ placement: 'bottom', title: moment.fromNow() });
     });
 
     logger.instance.prev('a').children('span').text('SPARQL log (' + logger.instance.children().length + ')');

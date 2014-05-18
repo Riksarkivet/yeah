@@ -5,7 +5,7 @@ var buildingPermit = {
   prefixes: {
     dc: 'http://purl.org/dc/elements/1.1/',
     foaf: 'http://xmlns.com/foaf/0.1/',
-    place: 'http://purl.org/ontology/places/#',
+    place: 'http://purl.org/ontology/places#',
     bpc: 'http://www.ldb-centrum.se/yeah/SwedishConcepts/20140123/',
     rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   },
@@ -26,7 +26,7 @@ var buildingPermit = {
       { type: 'bpc:Teknik', name: 'technology' },
       { type: 'bpc:Kvarter', name: 'block' },
       { type: 'bpc:fastighet', label: 'property' },
-      { type: 'bpc:klientnamn', label: 'client name(s)' },
+      { type: 'bpc:KlientNamn', name: 'klientnamn', label: 'client name(s)', blankNodeWithProperty: 'foaf:givenName' },
       { type: 'bpc:ovriganamn', label: 'other name(s)' }
     ];
 
@@ -43,18 +43,24 @@ var buildingPermit = {
   })(),
   orderBy: 'date',
   getButton: function (uri, data, title) {
+    if (!uri) {
+      return; // returns undefined
+    }
+
     var button = $('<button class="btn btn-default btn-xs"><i class="icon-' + buildingPermit.icon + '"></i> ' + (title ? title : buildingPermit.getTitle(data)) + '</button>')
     .click(function () {
       var contents = tab.create('#block-container', '<i class="icon-' + buildingPermit.icon + '"></i>', buildingPermit.getTitle(data), 'detail-' + uri.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
 
       table.create({
         //'Type': getConceptButton(data.rdfType, 'cogs'),
-        'Block': data.blockTitle ? block.getButton(data.block, null, data.blockTitle) : (function (contents) {
+        'Description': data.description,
+        'Year': data.year,
+        'Block': (function (contents) {
           sparql.getEntity(block, data.block, function (blockData) {
             contents.empty();
 
             if (blockData) {
-              contents.append(block.getButton(data.block, blockData));
+              contents.append(block.getButton(data.block, blockData, data.blockTitle));
             } else {
               contents.append('<div class="alert alert-warning">No such block could be found (<code>' + data.block + '</code>)</div>');
             }
@@ -62,28 +68,52 @@ var buildingPermit = {
 
           return contents;
         })($('<div>').append('<i class="icon icon-spin icon-refresh"></i>')),
-        'Street': street.getButton(data.street),
-        'Persons': (function () {
-          var container = $('<div>');
-
-          sparql.selectAll({
-            prefixes: buildingPermit.prefixes,
-            columns: ['?name'],
-            where: ['<' + uri + '> ?p [a foaf:Person; foaf:givenName ?name]'],
-            from: buildingPermit.graph
-          }, function (rows) {
-            _.chain(rows)
-            .pluck('name')
-            .filter(function (name) { return name.indexOf('se bild') == -1; })
-            .each(function (name) {
-              container.append(persons.getButton(name)).append(' ');
-            });
-          });
-
-          return container;
-        })(),
-        'Technology': data.technology ? getConceptButton(data.technology, 'cogs') : undefined,
+        'Street': data.street ? street.getButton(data.street) : undefined,
         'Parish': parish.doQuery(data.parish),
+        'Property info': data.fastighet,
+        'Architect': loadingPlaceholder(function (contents) {
+          sparql.selectOne({
+            prefixes: buildingPermit.prefixes,
+            columns: ['?givenName'],
+            where: [
+              '<' + data.arkitekt + '> foaf:givenName ?givenName'
+            ],
+            from: buildingPermit.graph
+          }, function (row) {
+            contents.empty();
+
+            if (row) {
+              contents.append($('<button class="btn btn-default btn-xs"><i class="icon-user"></i> ' + row.givenName + '</button>').click(function () {
+                showBuildingPermitPerson(data.arkitekt, 'Architect');
+              }));
+            }
+          });
+        }),
+        'Client': loadingPlaceholder(function (contents) {
+          sparql.selectOne({
+            prefixes: buildingPermit.prefixes,
+            columns: ['?givenName'],
+            where: [
+              '<' + data.klientnamn + '> foaf:givenName ?givenName'
+            ],
+            from: buildingPermit.graph
+          }, function (row) {
+            contents.empty();
+
+            if (row) {
+              contents.append($('<button class="btn btn-default btn-xs"><i class="icon-user"></i> ' + row.givenName + '</button>').click(function () {
+                showBuildingPermitPerson(data.klientnamn, 'Client');
+              }));
+            }
+          });
+        }),
+        'Other names': data.ovriganamn,
+        'Image': $('<a class="btn btn-default btn-xs" target="_blank"><i class="icon-picture"></i> Link</a>')
+        .attr('href', data.image),
+        'Technology': data.technology ? getConceptButton(data.technology, 'cogs') : undefined,
+        'Medium': data.technology ? getConceptButton(data.medium, 'cogs') : undefined,
+        'Format': data.format.join(', '),
+        'Type': data.type,
         'Other': [
           shortcuts.generate('building-permit', uri, data),
           ' ',
